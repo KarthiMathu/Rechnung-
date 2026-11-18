@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rechnungen</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rechnungen">
+<meta name="theme-color" content="#7c4dff">
+<style>
+:root{--bg:#f5f5f7;--card:#fff;--tx:#1c1c1e;--mu:#6e6e73;--ac:#0a7cff;--ok:#1a9b4b;--wa:#e08a00;--er:#d93025;--bd:#e0e0e5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#1c1c1e;--tx:#f2f2f7;--mu:#98989f;--ac:#4aa3ff;--ok:#32d26b;--wa:#ffb340;--er:#ff6b60;--bd:#38383a}}
+:root[data-theme="dark"]{--bg:#000;--card:#1c1c1e;--tx:#f2f2f7;--mu:#98989f;--ac:#4aa3ff;--ok:#32d26b;--wa:#ffb340;--er:#ff6b60;--bd:#38383a}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,system-ui,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:12px 14px 120px}
+h1{font-size:28px;margin:8px 0 12px}
+.row{display:flex;gap:8px;align-items:center}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);font:inherit}
+button{font:inherit;border:0;border-radius:12px;padding:12px 16px;background:var(--ac);color:#fff;font-weight:600}
+button.sec{background:var(--card);color:var(--ac);border:1px solid var(--bd)}
+.card{background:var(--card);border-radius:14px;padding:12px 14px;margin:8px 0;display:flex;justify-content:space-between;gap:10px}
+.card small{color:var(--mu)}
+.pill{font-size:13px;font-weight:700;border:0;padding:4px 10px;border-radius:99px;background:transparent}
+.paid{color:var(--ok)}.open{color:var(--wa)}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--bd)}
+.bar .in{max-width:640px;margin:0 auto;display:flex;gap:8px}.bar button{flex:1}
+dialog{width:calc(100% - 24px);max-width:560px;border:0;border-radius:16px;background:var(--bg);color:var(--tx);padding:14px}
+dialog::backdrop{background:#0008}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+.warn{padding:10px;border-radius:10px;margin:8px 0;font-weight:600}
+.warn.er{background:#d9302522;color:var(--er)}.warn.wa{background:#e08a0022;color:var(--wa)}
+.empty{text-align:center;color:var(--mu);padding:40px 10px}
+img.th{max-width:100%;max-height:150px;border-radius:8px;display:block;margin:6px 0}
+body{background:radial-gradient(circle at top left,#7c4dff26,transparent 50%),radial-gradient(circle at top right,#00b4d826,transparent 45%),var(--bg) fixed}
+h1{background:linear-gradient(90deg,#7c4dff,#00b4d8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+button:not(.sec):not(.pill){background:linear-gradient(135deg,#7c4dff,#00b4d8);box-shadow:0 4px 14px #7c4dff55}
+.pill.paid{background:#1a9b4b22}.pill.open{background:#e08a0022}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 12px}
+.tile{border-radius:18px;padding:14px;color:#fff;display:flex;flex-direction:column;gap:2px;box-shadow:0 6px 18px #0003}
+.tile small{opacity:.9;font-size:13px}.tile b{font-size:21px}.tile span{font-size:12px;opacity:.9}
+.t1{background:linear-gradient(135deg,#5b5bff,#8e5bff)}.t2{background:linear-gradient(135deg,#ff8a3d,#ff5e62)}.t3{background:linear-gradient(135deg,#12c26b,#0aa5a5)}.t4{background:linear-gradient(135deg,#00a3ff,#00d4c8)}
+.panel{background:var(--card);border-radius:18px;padding:14px;margin:10px 0;box-shadow:0 2px 10px #0000001a}
+.panel h3{margin:0 0 10px;font-size:15px}
+.prog{height:12px;border-radius:99px;background:#ff8a3d55;overflow:hidden}.prog i{display:block;height:100%;background:linear-gradient(90deg,#12c26b,#0aa5a5)}
+.chart{display:flex;align-items:flex-end;gap:8px;height:130px}
+.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--mu);gap:2px}
+.stack{width:100%;display:flex;flex-direction:column-reverse;border-radius:8px 8px 3px 3px;overflow:hidden;min-height:2px}.stack i{display:block;width:100%}
+.sp{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:13px}.sp span{width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sp div{flex:1;height:10px;background:var(--bd);border-radius:99px;overflow:hidden}.sp div i{display:block;height:100%;background:linear-gradient(90deg,#7c4dff,#00b4d8)}.sp em{font-style:normal;font-weight:600;min-width:76px;text-align:right}
+.chip{display:inline-block;padding:6px 11px;border-radius:99px;font-size:13px;font-weight:600;margin:3px 4px 0 0}
+.card{border-left:5px solid var(--bd);border-radius:16px;box-shadow:0 2px 10px #0000001a}.cp{border-left-color:var(--ok)}.co{border-left-color:var(--wa)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Rechnungen</h1>
+  <div id="dash"></div>
+  <div class="row"><input id="q" type="search" placeholder="Suchen: Lieferant oder Nummer"></div>
+  <div class="row" style="margin:8px 0">
+    <select id="flt"><option value="all">Alle</option><option value="open">Nur offene</option><option value="paid">Nur bezahlte</option></select>
+  </div>
+  <div class="row" style="margin-bottom:8px"><button class="sec" id="exp" style="flex:1">CSV</button><button class="sec" id="bak" style="flex:1">Sicherung</button><button class="sec" id="rst" style="flex:1">Laden</button></div>
+  <div id="list"></div>
+</main>
+<div class="bar"><div class="in">
+  <button id="scan">📷 Scannen</button>
+  <button class="sec" id="man">+ Manuell</button>
+</div></div>
+<input id="rfile" type="file" accept=".json,application/json" hidden>
+<input id="file" type="file" accept="image/*" capture="environment" hidden>
+
+<dialog id="dlg">
+  <h2 style="margin:0 0 4px">Rechnung prüfen / ändern</h2>
+  <div id="busy" style="display:none;color:var(--mu)">Lese Rechnung …</div>
+  <div id="scanbox" style="background:var(--card);border-radius:12px;padding:10px;margin:8px 0">
+    <label style="margin-top:0">Rechnungstext: Feld antippen, gedrückt halten, „Text scannen“ wählen und Kamera auf die Rechnung halten (läuft auf dem iPhone, ohne Cloud)</label>
+    <textarea id="f_raw" rows="3" placeholder="Hier scannen oder Text einfügen"></textarea>
+    <div class="row" style="margin-top:6px"><button class="sec" id="parse" style="flex:1">Daten auslesen</button><button class="sec" id="pic" style="flex:1">Foto anhängen</button></div>
+  </div>
+  <div id="dup"></div>
+  <img id="th" class="th" alt="" hidden>
+  <label>Lieferant</label><input id="f_sup">
+  <label>Rechnungsnummer</label><input id="f_num">
+  <label>Datum</label><input id="f_dat" type="date">
+  <label>Betrag (CHF)</label><input id="f_amt" inputmode="decimal">
+  <label>IBAN</label><input id="f_iban" autocapitalize="characters">
+  <label>Notiz</label><input id="f_note" placeholder="z. B. wer hat bezahlt">
+  <label style="display:flex;gap:8px;align-items:center;color:var(--tx)"><input id="f_paid" type="checkbox" style="width:auto"> Bezahlt</label>
+  <button id="del" class="sec" style="width:100%;margin-top:14px;color:var(--er);display:none">Aus Liste entfernen</button>
+  <div class="row" style="margin-top:14px"><button class="sec" id="cancel" style="flex:1">Abbrechen</button><button id="save" style="flex:1">Speichern</button></div>
+</dialog>
+
+<script>
+const KEY="rechnungen_v1";
+let items=[];
+try{items=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){items=[]}
+let thumb="",editId=null;
+function editItem(i){editId=i.id;thumb=i.img||"";open(i,false)}
+const $=id=>document.getElementById(id);
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){alert("Speicher voll: bitte alte Rechnungen löschen oder CSV exportieren.")}};
+const eur=n=>Number(n).toLocaleString("de-CH",{style:"currency",currency:"CHF"});
+const norm=s=>(s||"").toLowerCase().replace(/\s+/g,"");
+
+function render(){renderDash();
+  const q=$("q").value.toLowerCase(),f=$("flt").value,box=$("list");
+  box.textContent="";
+  const rows=items.filter(i=>(f==="all"||(f==="paid")===i.paid)&&(!q||(i.sup+i.num).toLowerCase().includes(q)));
+  if(!rows.length){const d=document.createElement("div");d.className="empty";d.textContent=items.length?"Keine Treffer.":"Noch keine Rechnungen. Tippe unten auf Scannen.";box.append(d);return}
+  rows.forEach(i=>{
+    const c=document.createElement("div");c.className="card "+(i.paid?"cp":"co");
+    const l=document.createElement("div");
+    const t=document.createElement("b");t.textContent=i.sup||"(ohne Lieferant)";
+    const s=document.createElement("small");s.textContent=" "+(i.num||"–")+" · "+(i.dat||"");
+    l.append(t,document.createElement("br"),s);
+    if(i.note){const n=document.createElement("div");n.style.fontSize="13px";n.textContent=i.note;l.append(n)}
+    l.style.flex="1";l.style.cursor="pointer";l.onclick=()=>editItem(i);
+    const r=document.createElement("div");r.style.textAlign="right";
+    const a=document.createElement("div");a.textContent=eur(i.amt);
+    const p=document.createElement("button");p.className="pill "+(i.paid?"paid":"open");p.textContent=i.paid?"bezahlt":"offen";
+    p.onclick=(e)=>{e.stopPropagation();i.paid=!i.paid;persist();render()};
+    const x=document.createElement("button");x.className="pill";x.style.color="var(--er)";x.textContent="entfernen";
+    x.onclick=()=>{if(x.dataset.s){items=items.filter(z=>z.id!==i.id);persist();render()}else{x.dataset.s="1";x.textContent="Sicher? Nochmal tippen";setTimeout(()=>{x.dataset.s="";x.textContent="entfernen"},3000)}};
+    r.append(a,p,document.createElement("br"),x);
+    c.append(l,r);box.append(c);
+  });
+}
+
+function draft(){return{sup:$("f_sup").value.trim(),num:$("f_num").value.trim(),dat:$("f_dat").value,amt:parseAmt($("f_amt").value),iban:$("f_iban").value,note:$("f_note").value,paid:$("f_paid").checked}}
+
+function parseAmt(v){
+  let s=String(v==null?"":v).replace(/[€\s'’]|CHF|Fr\./gi,"");if(!s)return 0;
+  const c=s.lastIndexOf(","),p=s.lastIndexOf(".");
+  if(c>=0&&p>=0){s=c>p?s.replace(/\./g,"").replace(",","."):s.replace(/,/g,"")}
+  else if(c>=0){s=s.replace(",",".")}
+  else if(/^\d{1,3}(\.\d{3})+$/.test(s)){s=s.replace(/\./g,"")}
+  return parseFloat(s)||0;
+}
+function key(s){return (s||"").toLowerCase().replace(/[^a-z0-9äöüß]/g,"")}
+function numKey(s){return key(s).replace(/^0+/,"")}
+function supSim(a,b){a=key(a);b=key(b);if(!a||!b)return false;return a.includes(b)||b.includes(a)||a.slice(0,5)===b.slice(0,5)}
+function findDup(d){
+  let poss=null;
+  for(const i of items){
+    if(i.id===editId)continue;
+    const sameNum=numKey(d.num).length>=3&&numKey(i.num)===numKey(d.num);
+    const sameAmt=d.amt>0&&Math.abs(i.amt-d.amt)<0.01;
+    const sameIban=key(d.iban)&&key(i.iban)===key(d.iban);
+    const sameSup=supSim(d.sup,i.sup);
+    if(sameNum&&(sameSup||sameAmt||sameIban))return{i,sure:true};
+    if(!poss&&(sameNum||(sameAmt&&(sameIban||sameSup||(d.dat&&i.dat===d.dat)))))poss=i;
+  }
+  return poss?{i:poss,sure:false}:null;
+}
+function checkDup(){
+  const d=draft(),box=$("dup");box.textContent="";
+  const m=findDup(d);if(!m)return;const hit=m.i,sure=m.sure;
+  const w=document.createElement("div");w.className="warn "+(sure?"er":"wa");
+  w.textContent=(sure?"⚠️ Doppelte Rechnung! Bereits gespeichert: ":"Mögliche Doppelung: ")+hit.sup+", "+hit.num+", "+eur(hit.amt)+" ("+(hit.paid?"bezahlt":"offen")+")";
+  box.append(w);
+}
+
+function fill(d){
+  $("f_sup").value=d.sup||"";$("f_num").value=d.num||"";$("f_dat").value=d.dat||new Date().toISOString().slice(0,10);
+  $("f_amt").value=d.amt||"";$("f_iban").value=d.iban||"";$("f_note").value=d.note||"";$("f_paid").checked=!!d.paid;checkDup();
+}
+function open(d,busy){
+  fill(d||{});$("f_raw").value="";$("del").style.display=editId?"block":"none";$("busy").style.display=busy?"block":"none";
+  $("th").hidden=!thumb;if(thumb)$("th").src=thumb;
+  if(!$("dlg").open)$("dlg").showModal();
+}
+["f_sup","f_num","f_dat","f_amt","f_iban"].forEach(id=>$(id).addEventListener("input",checkDup));
+
+function shrink(file,max,q){
+  return new Promise((res,rej)=>{
+    const img=new Image(),u=URL.createObjectURL(file);
+    img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");
+      c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(u);c.toBlob(b=>b?res({blob:b,url:c.toDataURL("image/jpeg",q)}):rej(new Error("x")),"image/jpeg",q)};
+    img.onerror=rej;img.src=u;
+  });
+}
+
+$("scan").onclick=()=>$("file").click();
+$("man").onclick=()=>{thumb="";editId=null;open({},false)};
+
+$("save").onclick=()=>{
+  const d=draft();
+  if(!d.sup&&!d.num&&!d.amt){alert("Bitte mindestens Lieferant, Nummer oder Betrag eingeben.");return}
+  if(editId){const o=items.find(z=>z.id===editId);if(o)Object.assign(o,d)}else items.unshift({id:Date.now()+"",...d,img:thumb});editId=null;persist();$("dlg").close();render();
+};
+$("cancel").onclick=()=>$("dlg").close();
+$("del").onclick=()=>{const b=$("del");if(!editId)return;if(b.dataset.s){items=items.filter(z=>z.id!==editId);editId=null;b.dataset.s="";b.textContent="Aus Liste entfernen";persist();$("dlg").close();render()}else{b.dataset.s="1";b.textContent="Sicher? Nochmal tippen";setTimeout(()=>{b.dataset.s="";b.textContent="Aus Liste entfernen"},3000)}};
+$("q").oninput=render;$("flt").onchange=render;
+
+async function saveFile(name,blob){
+  try{const dl=window.claude&&await claude.use("downloads");if(dl){await dl.save({filename:name,data:blob});return}}catch(e){}
+  try{const f=new File([blob],name,{type:blob.type});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}
+  catch(e){if(e&&e.name==="AbortError")return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+$("exp").onclick=()=>{
+  const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';
+  const rows=["Lieferant;Nummer;Datum;Betrag CHF;IBAN;Status;Notiz"].concat(items.map(i=>[i.sup,i.num,i.dat,String(i.amt).replace(".",","),i.iban,i.paid?"bezahlt":"offen",i.note].map(q).join(";")));
+  saveFile("rechnungen.csv",new Blob(["\ufeff"+rows.join("\n")],{type:"text/csv"}));
+};
+$("bak").onclick=()=>saveFile("rechnungen-sicherung.json",new Blob([JSON.stringify(items)],{type:"application/json"}));
+$("rst").onclick=()=>$("rfile").click();
+$("rfile").onchange=async e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  try{
+    const a=JSON.parse(await f.text());if(!Array.isArray(a))throw 0;
+    const ids=new Set(items.map(i=>i.id));let n=0;
+    a.forEach(i=>{if(i&&i.id&&!ids.has(String(i.id))){items.push({id:String(i.id),sup:String(i.sup||""),num:String(i.num||""),dat:String(i.dat||""),amt:Number(i.amt)||0,iban:String(i.iban||""),note:String(i.note||""),paid:!!i.paid,img:(typeof i.img==="string"&&i.img.indexOf("data:image/")===0)?i.img:""});n++}});
+    persist();render();alert(n+" Rechnungen geladen.");
+  }catch(err){alert("Datei konnte nicht gelesen werden.")}
+};
+function renderDash(){
+  const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n};
+  const b=$("dash");b.textContent="";
+  const tot=items.reduce((s,i)=>s+i.amt,0),op=items.filter(i=>!i.paid),so=op.reduce((s,i)=>s+i.amt,0),sp=tot-so;
+  const mk=(c,l,v,s)=>{const t=el("div","tile "+c);t.append(el("small",0,l),el("b",0,v),el("span",0,s));return t};
+  const g=el("div","tiles");
+  g.append(mk("t1","Gesamt",eur(tot),items.length+" Rechnungen"),mk("t2","Offen",eur(so),op.length+" noch offen"),mk("t3","Bezahlt",eur(sp),(items.length-op.length)+" erledigt"),mk("t4","Durchschnitt",eur(items.length?tot/items.length:0),"pro Rechnung"));
+  b.append(g);
+  if(!items.length)return;
+  const pct=tot?Math.round(sp/tot*100):0;
+  const p1=el("div","panel");p1.append(el("h3",0,"Zahlungsfortschritt: "+pct+" % bezahlt"));
+  const pr=el("div","prog"),pi=el("i");pi.style.width=pct+"%";pr.append(pi);p1.append(pr);b.append(p1);
+  const mo={};items.forEach(i=>{const m=(i.dat||"").slice(0,7);if(m){mo[m]=mo[m]||{p:0,o:0};mo[m][i.paid?"p":"o"]+=i.amt}});
+  const ks=Object.keys(mo).sort().slice(-6);
+  if(ks.length){
+    const mx=Math.max(...ks.map(k=>mo[k].p+mo[k].o))||1;
+    const p2=el("div","panel");p2.append(el("h3",0,"Monatsverlauf in CHF (grün bezahlt, orange offen)"));
+    const ch=el("div","chart");
+    ks.forEach(k=>{const c=el("div","col");c.append(el("div",0,Math.round(mo[k].p+mo[k].o)));
+      const st=el("div","stack"),a=el("i"),o=el("i");
+      a.style.cssText="background:var(--ok);height:"+(mo[k].p/mx*90)+"px";o.style.cssText="background:var(--wa);height:"+(mo[k].o/mx*90)+"px";
+      st.append(a,o);c.append(st,el("div",0,k.slice(5)+"/"+k.slice(2,4)));ch.append(c)});
+    p2.append(ch);b.append(p2);
+  }
+  const sm={};items.forEach(i=>{const k=key(i.sup)||"?";sm[k]=sm[k]||{n:i.sup||"(ohne)",s:0};sm[k].s+=i.amt});
+  const top=Object.values(sm).sort((x,y)=>y.s-x.s).slice(0,5),tm=top[0].s||1;
+  const p3=el("div","panel");p3.append(el("h3",0,"Top-Lieferanten"));
+  top.forEach(t=>{const r=el("div","sp"),bar=el("div"),fi=el("i");fi.style.width=(t.s/tm*100)+"%";bar.append(fi);r.append(el("span",0,t.n),bar,el("em",0,eur(t.s)));p3.append(r)});
+  b.append(p3);
+  let dups=0;
+  for(let x=0;x<items.length;x++)for(let y=x+1;y<items.length;y++){const a=items[x],c=items[y];if((numKey(a.num).length>=3&&numKey(a.num)===numKey(c.num))||(a.amt>0&&Math.abs(a.amt-c.amt)<0.01&&a.dat&&a.dat===c.dat))dups++}
+  const old=op.filter(i=>i.dat&&(Date.now()-new Date(i.dat))>30*864e5).length;
+  const big=items.reduce((a,c)=>c.amt>a.amt?c:a,items[0]);
+  const p4=el("div","panel");p4.append(el("h3",0,"Auffälligkeiten"));
+  const chip=(t,bg,fg)=>{const c=el("span","chip",t);c.style.background=bg;c.style.color=fg;p4.append(c)};
+  chip(dups?"⚠️ "+dups+" mögliche Doppelung"+(dups>1?"en":""):"✅ Keine Doppelungen",dups?"#d9302522":"#1a9b4b22",dups?"var(--er)":"var(--ok)");
+  chip(old?"⏰ "+old+" offen seit über 30 Tagen":"✅ Nichts überfällig",old?"#e08a0022":"#1a9b4b22",old?"var(--wa)":"var(--ok)");
+  chip("💶 Größte: "+(big.sup||"?")+" "+eur(big.amt),"#7c4dff22","var(--ac)");
+  b.append(p4);
+}
+function parseText(t){
+  const lines=t.split(/\n/).map(s=>s.trim()).filter(Boolean);
+  const d={sup:lines[0]||"",num:"",dat:"",amt:0,iban:"",note:"",paid:false};
+  let m=t.match(/(?:Rechnungs?-?\s?(?:nummer|nr\.?)|Invoice\s?(?:no\.?|number)|Beleg-?nr\.?)\s*[:#]?\s*([A-Z0-9][A-Z0-9\-\/_.]{2,})/i);if(m)d.num=m[1];
+  m=t.match(/\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){3,7}(?:\s?[A-Z0-9]{1,4})?\b/);if(m)d.iban=m[0];
+  m=t.match(/\b(\d{2})\.(\d{2})\.(\d{4})\b/);if(m)d.dat=m[3]+"-"+m[2]+"-"+m[1];
+  const am=s=>{const r=[],re=/(?:\d{1,3}(?:[.'’]\d{3})+|\d+)[.,]\d{2}(?![\d.,])/g;let m;while((m=re.exec(s))){if(m.index>0&&/[\d.,]/.test(s[m.index-1]))continue;r.push(parseAmt(m[0]))}return r};
+  const keys=["gesamt","summe","brutto","zahlbetrag","endbetrag","total","zu zahlen"];
+  const keyed=lines.filter(l=>keys.some(k=>l.toLowerCase().includes(k))).flatMap(am);
+  d.amt=keyed.length?keyed[keyed.length-1]:Math.max(0,...lines.flatMap(am));
+  return d;
+}
+$("scan").onclick=()=>{thumb="";editId=null;open({},false);setTimeout(()=>$("f_raw").focus(),50)};
+$("pic").onclick=()=>$("file").click();
+$("parse").onclick=()=>{const t=$("f_raw").value;if(!t.trim()){alert("Bitte zuerst Text scannen oder einfügen.");return}fill(parseText(t))};
+$("file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{const s=await shrink(f,360,0.6);thumb=s.url;$("th").src=thumb;$("th").hidden=false}catch(err){}};
+window.alert=m=>{let t=$("toast");if(!t){t=document.createElement("div");t.id="toast";t.style.cssText="position:fixed;left:14px;right:14px;bottom:90px;z-index:99;background:#222;color:#fff;padding:12px;border-radius:12px;text-align:center"}($("dlg").open?$("dlg"):document.body).append(t);t.textContent=m;t.hidden=false;setTimeout(()=>{t.hidden=true},3500)};
+render();
+</script>
+</body>
+</html>
